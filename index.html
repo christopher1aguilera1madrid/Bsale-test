@@ -38,7 +38,7 @@
       </form>
       <!-- carito de compra -->
         <div class="nav-item dropdown">
-          <i id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" onclick="imprimir3()" class="nav-link fas fa-shopping-cart" style="margin-left: 10px;"></i>
+          <i id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" onclick="printcart()" class="nav-link fas fa-shopping-cart" style="margin-left: 10px;"></i>
             <div class="dropdown-menu" aria-labelledby="navbarDropdown" style="width: 300px; overflow: auto;height: 200px">
               <div class="cart">
               </div>
@@ -159,6 +159,70 @@ function printmenucatg(data) {
 }
 //Se ejecuta inmediato al ingresar la pagina y aparecer todos las categorias
 getcategories();
+
+//Agregar producto al carro y aparecen los productos al hacer click en el
+async function addproduct(product) {
+let cart =[]
+//se extrae productos guardados anteriormente por la pagina al carro
+  if(sessionStorage.getItem('cart')!=null){
+    cart.push(sessionStorage.getItem('cart'))
+  }
+  sessionStorage.setItem('product', product)
+  cart.push(sessionStorage.getItem('product'))
+  sessionStorage.setItem('cart', cart)
+  alert("has agregado correctamente")
+}
+
+//inserta los productos seleccionados al carrito
+function printcart() {
+  $(".cart").html("");
+  $(".total").html("");
+  let total = 0
+  $("#empty").show()
+  $("#shopping").hide()
+  let cart = sessionStorage.getItem('cart')
+//Si existe productos en el carro, se mostraran, o sino de lo contrario aparecera mensaje sin productos
+  if(cart!=null){
+    $("#empty").hide()
+    $("#shopping").show()
+//se separa los productos
+    let arraycart = cart.split(",")
+    arraycart.forEach((u,i) => {
+//se separa la informacion del producto
+      let arrayproduct = u.split("]")
+      total = total + Number(arrayproduct[1])
+      $(".cart").append(`
+      <div class="row border-bottom border-dark" style="height:400%; padding-top:15px">
+        <div class="col-4">
+      <img src="${arrayproduct[2]}" style="width: 100px;">
+      </div>
+      <div class="col-8">
+      <p style="margin:0">${arrayproduct[0]}</p>
+      <p style="margin:0">$${arrayproduct[1]}</p>
+      <buttom onclick="deletemyproduct('${i}')">X Eliminar</buttom>
+    </div>
+      </div>
+      `);
+    });
+    $(".total").append(`
+      <p>total: $${total}</p>
+    `);
+  }
+}
+
+//elimina producto dentro del carro
+async function deletemyproduct(i) {
+  let cart = sessionStorage.getItem('cart')
+  //se separa los productos
+  let arraycart = cart.split(",")
+  //se elimina el producto en la ubicacion
+  arraycart.splice(i,1)
+  sessionStorage.setItem('cart', arraycart)
+  //En caso de eliminar todos los productos, se remueve el carro de compras
+  if(arraycart.length==0){
+    sessionStorage.removeItem("cart")
+  }
+}
 </script>
 </body>
 </html>
